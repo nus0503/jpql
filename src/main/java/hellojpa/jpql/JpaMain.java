@@ -2,11 +2,8 @@ package hellojpa.jpql;
 
 
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-
+import javax.persistence.*;
+import java.util.List;
 
 
 public class JpaMain {
@@ -24,7 +21,14 @@ public class JpaMain {
         try {
             Member member = new Member();
             member.setUsername("member1");
+            member.setAge(10);
             em.persist(member);
+
+            TypedQuery<Member> query1 = em.createQuery("select m from Member m", Member.class); // TypeQuery : 반환타입이 명확할 때 사용
+            List<Member> resultList = query1.getResultList();
+            Member singleResult = query1.getSingleResult(); // 결과값이 하나일 때만 사용
+            TypedQuery<String> query2 = em.createQuery("select m.username from Member m", String.class);
+            Query query3 = em.createQuery("select m.username, m.age from Member m"); //Query : 반환타입이 명확하지 않을 때 사용
 
             tx.commit();
         } catch (Exception e) {
