@@ -19,24 +19,27 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Member member = new Member();
-            member.setUsername("member1");
-            member.setAge(10);
-            em.persist(member);
+            for (int i = 0; i < 100; i++) {
+                Member member = new Member();
+                member.setUsername("member" + i);
+                member.setAge(i);
+                em.persist(member);
+            }
+//            Member member = new Member();
+//            member.setUsername("member1");
+//            member.setAge(10);
+//            em.persist(member);
 
             em.flush();
             em.clear();
 
-//            List<Member> result = em.createQuery("select m from Member m", Member.class)
-//                    .getResultList(); //엔티티 프로젝션하면 해상이 select절에 10개, 20개 나와도 다 영속성 컨텍스트에서 관리된다.
-//
-//            Member findMember = result.get(0);
-//            findMember.setAge(20);
+            List<Member> result = em.createQuery("select m from Member m order by m.age desc", Member.class)
+                    .setFirstResult(1)
+                    .setMaxResults(10)
+                    .getResultList();
+            System.out.println(result.size());
+            result.forEach(System.out::println);
 
-            List<MemberDTO> resultList = em.createQuery("select new hellojpa.jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class).getResultList();
-            MemberDTO memberDTO = resultList.get(0);
-            System.out.println("memberDTO = " + memberDTO.getUsername());
-            System.out.println("memberDTO = " + memberDTO.getAge());
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
