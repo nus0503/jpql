@@ -24,12 +24,10 @@ public class JpaMain {
             member.setAge(10);
             em.persist(member);
 
-            TypedQuery<Member> query1 = em.createQuery("select m from Member m", Member.class); // TypeQuery : 반환타입이 명확할 때 사용
-            List<Member> resultList = query1.getResultList();
-            Member singleResult = query1.getSingleResult(); // 결과값이 하나일 때만 사용
-            TypedQuery<String> query2 = em.createQuery("select m.username from Member m", String.class);
-            Query query3 = em.createQuery("select m.username, m.age from Member m"); //Query : 반환타입이 명확하지 않을 때 사용
-
+            TypedQuery<Member> query = em.createQuery("select m from Member m where m.username = :username", Member.class); // TypeQuery : 반환타입이 명확할 때 사용
+            query.setParameter("username", "member1");
+            Member singleResult = query.getSingleResult();
+            System.out.println(singleResult.getUsername());
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
