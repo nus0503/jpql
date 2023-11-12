@@ -24,10 +24,19 @@ public class JpaMain {
             member.setAge(10);
             em.persist(member);
 
-            TypedQuery<Member> query = em.createQuery("select m from Member m where m.username = :username", Member.class); // TypeQuery : 반환타입이 명확할 때 사용
-            query.setParameter("username", "member1");
-            Member singleResult = query.getSingleResult();
-            System.out.println(singleResult.getUsername());
+            em.flush();
+            em.clear();
+
+//            List<Member> result = em.createQuery("select m from Member m", Member.class)
+//                    .getResultList(); //엔티티 프로젝션하면 해상이 select절에 10개, 20개 나와도 다 영속성 컨텍스트에서 관리된다.
+//
+//            Member findMember = result.get(0);
+//            findMember.setAge(20);
+
+            List<MemberDTO> resultList = em.createQuery("select new hellojpa.jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class).getResultList();
+            MemberDTO memberDTO = resultList.get(0);
+            System.out.println("memberDTO = " + memberDTO.getUsername());
+            System.out.println("memberDTO = " + memberDTO.getAge());
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
