@@ -3,6 +3,7 @@ package hellojpa.jpql;
 
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -37,10 +38,15 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            String query = "select m from Member m left join m.team t on t.name = 'teamA'";
-            List<Member> result = em.createQuery(query, Member.class)
+            String query = "select t.members from Team t"; // X -> 묵시적 조인
+            String query2 = "select m.username from Team t join t.members m "; // O -> 명시적 조인을 사용하라
+            Collection result = em.createQuery(query, Collection.class)
                     .getResultList();
-            System.out.println("result = " + result.size());
+
+            for (Object o : result) {
+                System.out.println("o = " + o);
+            }
+
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
