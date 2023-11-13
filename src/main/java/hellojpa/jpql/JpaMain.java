@@ -20,16 +20,28 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            Team teamA = new Team();
+            teamA.setName("teamA");
+            em.persist(teamA);
+
+            Team teamB = new Team();
+            teamB.setName("teamB");
+            em.persist(teamB);
 
             Member member = new Member();
-            member.setUsername("member1");
-            member.setAge(10);
-            member.changeTeam(team);
-
+            member.setUsername("회원1");
+            member.changeTeam(teamA);
             em.persist(member);
+
+            Member member2 = new Member();
+            member2.setUsername("회원2");
+            member2.changeTeam(teamA);
+            em.persist(member2);
+
+            Member member3 = new Member();
+            member3.setUsername("회원3");
+            member3.changeTeam(teamB);
+            em.persist(member3);
 //            Member member = new Member();
 //            member.setUsername("member1");
 //            member.setAge(10);
@@ -38,13 +50,16 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            String query = "select t.members from Team t"; // X -> 묵시적 조인
-            String query2 = "select m.username from Team t join t.members m "; // O -> 명시적 조인을 사용하라
-            Collection result = em.createQuery(query, Collection.class)
+            String query = "select t from Team t join fetch t.members";
+            List<Team> result = em.createQuery(query, Team.class)
                     .getResultList();
+            int i = 0;
+            for (Team team : result) {
 
-            for (Object o : result) {
-                System.out.println("o = " + o);
+                System.out.println("team = " + team.getName() + ", team = " + team);
+                for (Member member1 : team.getMembers()) {
+                    System.out.println("-> username = " + member1.getUsername() + ", member = " + member1);
+                }
             }
 
             tx.commit();
